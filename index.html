@@ -6,7 +6,9 @@
 
 <body>
 
-	<label>Food:
+	<label id="day"></label> - <label id="hour"></label>
+	<br>
+	<label>Food : 
 		<progress id="foodBar" value='0' max="100"></progress>
 	</label><p>
 	<label>Water:
@@ -14,7 +16,16 @@
 	</label><p>
 	<button onclick=eat('berry')>Berries</button>
 	<button onclick=drink('rain')>Rain Water</button>
+	<div id='crafting'>
+		<label>Crafting:</label><br>
+		<button onclick=craft('stoneHatchet')>Stone Hatchet</button>
+	</div>
 
+	<p>
+	<font color='red'><label id='status'></label></font><p>
+
+	<label>Journal:</label><br>
+	<textarea></textarea>
 	<script src="js/engine.js"></script>
 </body>
 
