@@ -1,31 +1,47 @@
 <html>
 
 <head>
+	<title>The Island</title>
 	<link rel="stylesheet" type="text/css" src="css/index.css"/>
 </head>
 
 <body>
 
-	<label id="day"></label> - <label id="hour"></label>
-	<br>
-	<label>Food : 
-		<progress id="foodBar" value='0' max="100"></progress>
-	</label><p>
-	<label>Water:
-		<progress id="waterBar" value='0' max="100"></progress>
-	</label><p>
-	<button onclick=eat('berry')>Berries</button>
-	<button onclick=drink('rain')>Rain Water</button>
-	<div id='crafting'>
-		<label>Crafting:</label><br>
-		<button onclick=craft('stoneHatchet')>Stone Hatchet</button>
+	<div id='stats'>
+		<label id="day"></label> - <label id="hour"></label>
+		<p>
+
+		<label>Food : 
+			<progress id="foodBar" value='0' max="100"></progress>
+		</label><br>
+		<label>Water:
+			<progress id="waterBar" value='0' max="100"></progress>
+		</label>
+		<p>
 	</div>
 
+	<div id="inventory">
+		<label>Inventory:</label>
+
+	</div>
 	<p>
+
+	<div id='crafting'>
+		<label>Crafting:</label><br>
+		
+	</div>
+	<p>
+
 	<font color='red'><label id='status'></label></font><p>
 
 	<label>Journal:</label><br>
 	<textarea></textarea>
+
+	<script src="js/player.js"></script>
+	<script src="js/regions.js"></script>
+	<script src="js/items.js"></script>
+	<script src="js/waterTypes.js"></script>
+	<script src="js/foodTypes.js"></script>
 	<script src="js/engine.js"></script>
 </body>
 
