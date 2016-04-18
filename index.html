@@ -2,40 +2,83 @@
 
 <head>
 	<title>The Island</title>
-	<link rel="stylesheet" type="text/css" src="css/index.css"/>
+	<link rel="stylesheet" type="text/css" href="css/index.css?v=11"/>
 </head>
 
 <body>
+	<div id="content">
+		<div id="map">
+			<img src="img/map.png" style="width:100%; height: 100%;">
+		</div>	
 
-	<div id='stats'>
-		<label id="day"></label> - <label id="hour"></label>
-		<p>
+		<div id="stats">
+			<label id="day"></label> - <label id="hour"></label>
+			<p>
 
-		<label>Food : 
-			<progress id="foodBar" value='0' max="100"></progress>
-		</label><br>
-		<label>Water:
-			<progress id="waterBar" value='0' max="100"></progress>
-		</label>
-		<p>
+			<label>Food : 
+				<progress id="foodBar" value='0' max="100"></progress>
+			</label><br>
+			<label>Water:
+				<progress id="waterBar" value='0' max="100"></progress>
+			</label>
+			<p>
+		</div>	
+
+		<div id="items">
+
+		</div>
+
+		<div id="actions">
+			<div id="actionButtons">
+				<div id='eat' class="option">
+					<button>Eat</button>
+					<br>
+					<select width="100%">
+						<option value="" disabled selected>Select food...</option>
+					</select>
+				</div>
+
+				<div id='drink' class="option">
+					<button>Drink</button>
+					<br>
+					<select width="100%">
+						<option value="" disabled selected>Select drink...</option>
+					</select>
+				</div>
+
+				<div id='explore' class="option">
+					<button onclick="explore()">Explore</button>
+					<br>
+					<select id="x">
+						<option value="" disabled selected></option>
+						<option value="A">A</option>
+						<option value="B">B</option>
+						<option value="C">C</option>
+						<option value="D">D</option>
+						<option value="E">E</option>
+						<option value="F">F</option>
+						<option value="G">G</option>
+						<option value="H">H</option>
+					</select>
+					<select id="y">
+						<option value="" disabled selected></option>
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+						<option value="6">6</option>
+					</select>
+				</div>
+			</div>
+		</div>
+
+		<div id="log">
+			<div id="logbook" style="overflow-y: scroll; height:100%; width:100%;">
+			</div>
+		</div>
+
 	</div>
-
-	<div id="inventory">
-		<label>Inventory:</label>
-
-	</div>
-	<p>
-
-	<div id='crafting'>
-		<label>Crafting:</label><br>
-		
-	</div>
-	<p>
-
-	<font color='red'><label id='status'></label></font><p>
-
-	<label>Journal:</label><br>
-	<textarea></textarea>
 
 	<script src="js/player.js"></script>
 	<script src="js/regions.js"></script>
@@ -43,6 +86,8 @@
 	<script src="js/waterTypes.js"></script>
 	<script src="js/foodTypes.js"></script>
 	<script src="js/engine.js"></script>
+	<script src="js/gui.js"></script>
+
 </body>
 
 </html>

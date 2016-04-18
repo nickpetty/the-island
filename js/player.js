@@ -3,6 +3,12 @@ var player = {
 	'food':100,
 	'water':100,
 	'day':0,
-	'hour':0,
-	'stocks': {}
+	'hour':12,
+	'stocks': {},              // <item_id>:<quanity>
+	'foodStores': {},          // <food_id>:<quanity>
+	'waterStores': {},         // <water_id>:<quanity>
+	'tools':{},                // <item_id>:<health>
+	'craftableItems':[],       // <item_id>
+	'discoveredRegions':[],    // <region_id>
+	'discoveredMaterials':[]   // <mat_id>
 }
