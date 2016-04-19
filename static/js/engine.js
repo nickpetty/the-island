@@ -45,7 +45,7 @@ function gather(material) {
 
 function log(text) {
 	var logbook = document.getElementById('logbook');
-	logbook.innerHTML = logbook.innerHTML + "<br><font size='2'>  " + text + "</font>"
+	logbook.innerHTML = "<br><font size='2'>  " + text + "</font>" + logbook.innerHTML
 	console.log(text);
 };
 
@@ -57,72 +57,78 @@ function explore() {
 	var x_coord = ['A','B','C','D','E','F','G','H'];
 	var y_coord = [1,2,3,4,5,6];
 
-	if (x_coord.indexOf(x) > -1) {
-		if (y_coord.indexOf(y) > -1) {
+	if (area in regions) { // check if area is explorable
+		var reqItems = regions[area]['tools']
 
-			if (regions.indexOf(area) > -1) { // check if area is explorable
-				var noItems = [];
+		if (!(player['discoveredRegions'].indexOf(area) > -1)) { // discovering region
+			console.log(area);
+			log(regions[area]['dialog']);
+			player['discoveredRegions'].push(area);
+		}
+		
 
-				for (tool in regions[area]['tools']) {
-					if (!(tool in player['tools'])) {
-						console.log(tool);
-						noItems.push(tool);
-					};
-				};
-				
-				if (noItems != '') {
-					log('You still need: ');
-					for (var item in noItems) {
-						log(" - " + item);
-					};
+		if (reqItems != '') {
+			log('You still need: ' + reqItems);
+			affectFood(regions[area]['foodUse']);
+			affectWater(regions[area]['waterUse']);
 
-				} else {
+		} else {
 
-					log(regions[area]['dialog']);
-					log('Searching ' + regions[area]['name']);
+			affectFood(regions[area]['foodUse']);
+			affectWater(regions[area]['waterUse']);
 
-					for (var material in regions[area]['materials']){
+			log('Searching ' + regions[area]['name'] + '..');
 
-						amnt = Math.floor((Math.random() * regions[area]['materials'][material]) + 0);
+			var found = 0;
+			for (var material in regions[area]['materials']){
 
-						if (amnt > 0) {
+				amnt = Math.floor((Math.random() * regions[area]['materials'][material]) + 0);
 
-							log('Found ' + amnt + ' ' + material + '(s).');
+				if (amnt > 0) {
 
-							if (material in foodTypes) { // see if material found is food
-								if (material in player['stocks']) {
-									player['stocks'][foodStores] += amnt;	
-								} else {
-									player['stocks'][foodStores] = amnt;
-								}
-							} else {
+					log('Found ' + amnt + ' ' + material + '(s).');
+					found += 1;
 
-								if (material in player['stocks']) {
-									player['stocks'][material] += amnt;	
-								} else {
-									player['stocks'][material] = amnt;
-								}
-							}		 
+					if (material in foodTypes) { // see if material found is food
+						if (material in player['stocks']) {
+							player['foodStores'][material] += amnt;	
+						} else {
+							player['foodStores'][material] = amnt;
+						}
+					} 
+					if (material in waterTypes) { // see if material found is food
+						if (material in player['stocks']) {
+							player['waterStores'][material] += amnt;	
+						} else {
+							player['waterStores'][material] = amnt;
 						}
 					}
+					if (material in materials) {
+						if (material in player['stocks']) {
+							player['stocks'][material] += amnt;	
+						} else {
+							player['stocks'][material] = amnt;
+						}
+					}  
 				}
-
-			} else {
-				log("Nothing here..");
 			}
-		} else {
-			log("Can't get there..");
+
+			if (found < 1) {
+				log("Nothing found...")
+			}
 		}
+
 	} else {
-		log("Can't get there..")
+		log("Nothing here..");
 	}
+
 	x = '';
 	y = '';	
 };
 
 // functions
 function update () {
-	console.log('decreasing');
+	console.log('tick');
 	affectFood(1);
 	affectWater(1);
 	updateHour(1);
@@ -132,18 +138,24 @@ function update () {
 function checkHealth () {
 	if (foodLevel < 1 || waterLevel < 1) {
 		clearInterval(tick);
-		//document.getElementById('status').innerHTML = 'You died.';
+		log('You died.');
 	};
 };
 
 function affectFood(amt) {
 	foodLevel = foodLevel - (amt * foodRate);
+	if (foodLevel > 100) {
+		foodLevel = 100;
+	};
 	foodBar.value = foodLevel;
 	player['food'] = foodLevel;
 };
 
 function affectWater(amt) {
 	waterLevel = waterLevel - (amt * waterRate);
+	if (waterLevel > 100) {
+		waterLevel = 100;
+	};
 	waterBar.value = waterLevel;
 	player['water'] = waterLevel;
 };

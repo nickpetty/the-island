@@ -9,6 +9,11 @@ var tools = {
 		'time':1,
 		'foodUse':3, //multiplier
 		'waterUse':2, //multiplier
+	},
+
+	'bucket':{
+		'item_id':2,
+		
 	}
 }
 

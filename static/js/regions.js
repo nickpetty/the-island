@@ -13,8 +13,10 @@ var regions = {
 		'dialog':"Found a cave.  It's not that deep.  This should make a good shelter.",
 		'foodUse':0,
 		'waterUse':0,
+		'tools':[],
 		'materials':{
-			'bones':2
+			'bones':2,
+			'stone':3
 		}
 	},
 
@@ -26,6 +28,17 @@ var regions = {
 		'tools':['rope'],
 		'materials':{
 			'gold':15
+		}
+	},
+
+	'G3':{
+		'name':'waterfall',
+		'dialog':'This should be a good source of fresh water.',
+		'foodUse':10,
+		'waterUse':-6,
+		'tools':['bucket'],
+		'materials':{
+			'water':30
 		}
 	}
 }
