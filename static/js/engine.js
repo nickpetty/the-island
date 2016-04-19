@@ -27,6 +27,9 @@ function god(i) {
 
 function speed(x) {
 	clearInterval(tick);
+	if (x == null) {
+		x = 30000;
+	};
 	tick = setInterval(update, x);
 	console.log('speed changed to ' + x + '.  Default: 30000');
 
@@ -41,7 +44,15 @@ function craft(item) {
 
 function gather(material) {
 
-}
+};
+
+function give(type, obj, amnt) {
+
+};
+
+function use(obj) {
+
+};
 
 function log(text) {
 	var logbook = document.getElementById('logbook');
@@ -67,7 +78,7 @@ function explore() {
 		}
 		
 
-		if (reqItems != '') {
+		if (reqItems != '') { // check if tools needed to explore area
 			log('You still need: ' + reqItems);
 			affectFood(regions[area]['foodUse']);
 			affectWater(regions[area]['waterUse']);
@@ -77,14 +88,21 @@ function explore() {
 			affectFood(regions[area]['foodUse']);
 			affectWater(regions[area]['waterUse']);
 
-			log('Searching ' + regions[area]['name'] + '..');
+			//log('Searching ' + regions[area]['name'] + '..');
 
 			var found = 0;
 			for (var material in regions[area]['materials']){
-
+			
 				amnt = Math.floor((Math.random() * regions[area]['materials'][material]) + 0);
 
 				if (amnt > 0) {
+
+					if (materials[material]['tool'] != '') { // check if material needs tool
+						if (!(materials[material]['tool'] in player['tools'])) {
+							log("You'll need a " + materials[material]['tool'] + " to harvest " + material);
+							continue;
+						}
+					}			
 
 					log('Found ' + amnt + ' ' + material + '(s).');
 					found += 1;
@@ -96,14 +114,14 @@ function explore() {
 							player['foodStores'][material] = amnt;
 						}
 					} 
-					if (material in waterTypes) { // see if material found is food
+					if (material in waterTypes) { // see if material found is water
 						if (material in player['stocks']) {
 							player['waterStores'][material] += amnt;	
 						} else {
 							player['waterStores'][material] = amnt;
 						}
 					}
-					if (material in materials) {
+					if (material in materials) { // see if material found is material
 						if (material in player['stocks']) {
 							player['stocks'][material] += amnt;	
 						} else {

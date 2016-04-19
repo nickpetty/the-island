@@ -15,7 +15,7 @@ var regions = {
 		'waterUse':0,
 		'tools':[],
 		'materials':{
-			'bones':2,
+			'bone':2,
 			'stone':3
 		}
 	},
@@ -39,6 +39,18 @@ var regions = {
 		'tools':['bucket'],
 		'materials':{
 			'water':30
+		}
+	},
+
+	'G2':{
+		'name':'ironMountain',
+		'dialog':'Seems to be some iron in these rocks...',
+		'foodUse':13,
+		'waterUse':11,
+		'tools':[],
+		'materials':{
+			'stone':10,
+			'iron':12
 		}
 	}
 }

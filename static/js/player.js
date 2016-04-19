@@ -10,5 +10,6 @@ var player = {
 	'tools':{},                // <item_id>:<health>
 	'craftableItems':[],       // <item_id>
 	'discoveredRegions':[],    // <region_id>
-	'discoveredMaterials':[]   // <mat_id>
+	'discoveredMaterials':[],  // <mat_id>
+	'multipliers':{}
 }
