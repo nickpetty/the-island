@@ -16,7 +16,8 @@ var regions = {
 		'tools':[],
 		'materials':{
 			'bone':2,
-			'stone':3
+			'stone':3,
+			'wood':3,
 		}
 	},
 
@@ -25,7 +26,7 @@ var regions = {
 		'dialog':"There's a pretty deep hole here.. I'll need some rope.",
 		'foodUse':5,
 		'waterUse':3,
-		'tools':['rope'],
+		'tools':['Rope'],
 		'materials':{
 			'gold':15
 		}

@@ -71,6 +71,7 @@ body {
     margin-bottom: 3px;
     text-decoration: none;
     overflow: hidden;
+    cursor: pointer;
 }
 
 #stocks {

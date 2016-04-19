@@ -36,10 +36,47 @@ function speed(x) {
 }
 
 function craft(item) {
-	// Check requirements
-	for (var req in items[item]['requires']) {
-		console.log(req);
-	}
+	var req = tools[item]['requires'];
+	var craftable = 0;
+	if (item in player['tools']) {
+		log('No need to make anymore of these...');
+	} else {
+		for (var mat in req) {
+			if (mat in player['stocks']) { // check if material has been discovered.
+				console.log(tools[item]['requires'][mat]);
+				console.log(player['stocks'][mat]);
+				if (player['stocks'][mat] < tools[item]['requires'][mat]) {
+					log('You need more ' + mat + '. Requires: ' + tools[item]['requires'][mat]);
+					craftable = 1;
+				};
+			} else {
+				log('You still need to find ' + mat);
+				craftable = 1;
+			};
+		};
+
+		if (craftable == 0) {
+			log('Crafting ' + item);
+			player['tools'][item] = tools[item];
+			for (var mat in req) { // subtract materials
+				player['stocks'][mat] = player['stocks'][mat] - tools[item]['requires'][mat];
+			};
+
+			player['food'] = player['food'] - tools[item]['foodUse'];
+			player['water'] = player['water'] - tools[item]['waterUse'];
+
+			updateTools();
+			updateStocks();
+			updateHour(tools[item]['time']);
+			for (var multi in tools[item]['multipliers']) {
+				if (multi in player['multipliers']) {
+					player['multipliers'][multi] += tools[item]['multipliers'][multi];
+				}  else {
+					player['multipliers'][multi] = tools[item]['multipliers'][multi];
+				};
+			};
+		};
+	};
 };
 
 function gather(material) {
@@ -53,6 +90,29 @@ function give(type, obj, amnt) {
 function use(obj) {
 
 };
+
+function updateStocks() {
+	var stocks = document.getElementById('stocks');
+	stocks.innerHTML = "";
+	for (var item in player['stocks']){
+		stocks.innerHTML += '<span>' + item + ': ' + player['stocks'][item] + '</span><br>';	
+	}
+};
+
+function updateTools() {
+	var toolsdiv = document.getElementById('tools');
+	toolsdiv.innerHTML = "";
+	for (var item in tools) {
+		var span;
+		if (item in player['tools']){
+			span = "<span id='tool' onclick='craft(" + '"' + item + '"' + ")'>" + item + "</span>";			
+			
+		} else {
+			span = "<span id='tool' style='color:gray;' onclick='craft(" + '"' + item + '"' + ")'>" + item + "</span>";
+		}
+		toolsdiv.innerHTML +=  span; 
+	};
+}
 
 function log(text) {
 	var logbook = document.getElementById('logbook');
@@ -70,6 +130,7 @@ function explore() {
 
 	if (area in regions) { // check if area is explorable
 		var reqItems = regions[area]['tools']
+		var explore = 0;
 
 		if (!(player['discoveredRegions'].indexOf(area) > -1)) { // discovering region
 			console.log(area);
@@ -79,11 +140,24 @@ function explore() {
 		
 
 		if (reqItems != '') { // check if tools needed to explore area
-			log('You still need: ' + reqItems);
+			var x = [];
+			for (var i = reqItems.length - 1; i >= 0; i--) {
+				if (!(reqItems[i] in player['tools'])) {
+					x.push(reqItems[i])
+					explore = 1;
+				}
+			}
+
+			if (x.length > 0) {
+				log('You need ' + reqItems + ' to explore this area.');
+				log('You still need ' + x);
+			}
+		};
+
+		if (explore == 1) {
 			affectFood(regions[area]['foodUse']);
 			affectWater(regions[area]['waterUse']);
-
-		} else {
+		} else if (explore == 0) {
 
 			affectFood(regions[area]['foodUse']);
 			affectWater(regions[area]['waterUse']);
@@ -96,6 +170,10 @@ function explore() {
 				amnt = Math.floor((Math.random() * regions[area]['materials'][material]) + 0);
 
 				if (amnt > 0) {
+					//multiply based on tools
+					if (material in player['multipliers']){
+						amnt = amnt * player['multipliers'][material];
+					};
 
 					if (materials[material]['tool'] != '') { // check if material needs tool
 						if (!(materials[material]['tool'] in player['tools'])) {
@@ -127,7 +205,8 @@ function explore() {
 						} else {
 							player['stocks'][material] = amnt;
 						}
-					}  
+					}
+					updateStocks();  
 				}
 			}
 
@@ -213,6 +292,7 @@ function startGame() {
 	waterBar.value = player['water'];
 	updateDay(player['day']);
 	updateHour(player['hour']);
+	updateTools();
 	tick = setInterval(update, tickRate);
 
 	log('You awake, washed ashore.');
