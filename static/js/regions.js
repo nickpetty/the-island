@@ -8,6 +8,18 @@ var regions = {
 		}
 	},
 
+	'E5':{
+		'name':'',
+		'dialog':"",
+		'foodUse':1,
+		'waterUse':1,
+		'tools':[],
+		'materials':{
+			'stone':3,
+			'wood':3,
+		}
+	},
+
 	'D5':{
 		'name':'cave',
 		'dialog':"Found a cave.  It's not that deep.  This should make a good shelter.",

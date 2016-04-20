@@ -1,13 +1,17 @@
 var hour = 0;
 var day = 0;
+var min = 0;
 var hourStamp = document.getElementById('hour');
 var dayStamp = document.getElementById('day');
+var minStamp = document.getElementById('min');
 var foodLevel = 100;
 var waterLevel = 100;
 var foodBar = document.getElementById('foodBar');
 var waterBar = document.getElementById('waterBar');
-var tickRate = 30000;
+var tickRate = 500;
 var tick; // timer
+var ticksOn = 0;
+var minsOn = 0;
 var foodRate = 0.19;
 var waterRate = 1.4;
 
@@ -91,6 +95,63 @@ function use(obj) {
 
 };
 
+function addStocks(item, amnt) {
+	//determine type (material, food, water)
+	if (item in materials) { // material
+		if (item in player['stocks']){
+			player['stocks'][item] += amnt;
+			delete player['inventory'][item];
+		} else {
+			player['stocks'][item] = amnt;
+			delete player['inventory'][item];
+		};
+	};
+
+	if (item in foodTypes) { // food
+		if (item in player['food']){
+			player['food'][item] += amnt;
+			delete player['inventory'][item];
+		} else {
+			player['food'][item] = amnt;
+			delete player['inventory'][item];
+		};
+	};
+
+	if (item in waterTypes) { // water
+		if (item in player['water']){
+			player['water'][item] += amnt;
+			delete player['inventory'][item];
+		} else {
+			player['water'][item] = amnt;
+			delete player['inventory'][item];
+		};
+	};
+
+};
+
+function removeStocks() {
+
+}
+
+function addInventory(item, amount) {
+	if (item in player['inventory']){
+		player['inventory'][item] += amount;
+	} else {
+		player['inventory'][item] = amount;
+	}
+}
+
+function searchArea() {
+
+}
+
+
+function setLocation(area) {
+	var locationSpan = document.getElementById('location');
+	locationSpan.innerHTML = area;
+	player['location'] = area;
+}
+
 function updateStocks() {
 	var stocks = document.getElementById('stocks');
 	stocks.innerHTML = "";
@@ -101,17 +162,26 @@ function updateStocks() {
 
 function updateTools() {
 	var toolsdiv = document.getElementById('tools');
-	toolsdiv.innerHTML = "";
+	var spanExplore = "<span id='tool' onclick='map(" + '"' + "visible" + '"' + ")'>Map</span>";
+	toolsdiv.innerHTML = spanExplore;
+
 	for (var item in tools) {
 		var span;
 		if (item in player['tools']){
-			span = "<span id='tool' onclick='craft(" + '"' + item + '"' + ")'>" + item + "</span>";			
+			span = "<span id='tool' onclick='use(" + '"' + item + '"' + ")'>" + item + "</span>";			
 			
 		} else {
 			span = "<span id='tool' style='color:gray;' onclick='craft(" + '"' + item + '"' + ")'>" + item + "</span>";
 		}
-		toolsdiv.innerHTML +=  span; 
+		toolsdiv.innerHTML += span; 
 	};
+}
+
+function map(display) {
+	var map = document.getElementById('map');
+	var hide = document.getElementById('hide');
+	map.style.visibility = display;
+	hide.style.visibility = display;
 }
 
 function log(text) {
@@ -120,13 +190,59 @@ function log(text) {
 	console.log(text);
 };
 
+function go(){
+	x = document.getElementById('x').value;
+	y = document.getElementById('y').value;
+	var x_coord = ['A','B','C','D','E','F','G','H'];
+	var area = x + y;
+	var crntLocX = parseInt(x_coord.indexOf(player['location'][0]) - 1);
+	var crntLocY = parseInt(player['location'][1]);
+	x = x_coord.indexOf(area[0]) - 1;
+	var distance = Math.round(Math.sqrt(Math.pow(x-crntLocX,2) + Math.pow(y-crntLocY,2))); //determine food and water usage based on distance
+
+	if (area == 'D5') { // if we're back home
+		if (Object.keys(player['inventory']).length > 0){
+			for (item in player['inventory']){
+				addStocks(item, player['inventory'][item]);
+			}
+		}
+		affectFood(distance*2);
+		affectWater(distance);
+		updateMin(distance*5);
+		setLocation(area);
+		map('hidden');
+	} else {
+		if (area in regions) {
+			if (!(player['discoveredRegions'].indexOf(area) > -1)) { // discovering region
+				console.log(area);
+				log(regions[area]['dialog']);
+				player['discoveredRegions'].push(area);
+			};
+		};
+		
+		affectFood(distance*2);
+		affectWater(distance);
+		updateMin(distance*5);
+		setLocation(area);
+		map('hidden');
+	}
+}
+
 function explore() {
 	x = document.getElementById('x').value;
 	y = document.getElementById('y').value;
-	console.log(x + y);
 	var area = x + y;
 	var x_coord = ['A','B','C','D','E','F','G','H'];
 	var y_coord = [1,2,3,4,5,6];
+
+	if (area == 'D5') { // if we're back home
+		if (Object.keys(player['inventory']).length > 0){
+			for (item in player['inventory']){
+				addStocks(item, player['inventory'][item]);
+			}
+		}
+		return;
+	}
 
 	if (area in regions) { // check if area is explorable
 		var reqItems = regions[area]['tools']
@@ -185,27 +301,7 @@ function explore() {
 					log('Found ' + amnt + ' ' + material + '(s).');
 					found += 1;
 
-					if (material in foodTypes) { // see if material found is food
-						if (material in player['stocks']) {
-							player['foodStores'][material] += amnt;	
-						} else {
-							player['foodStores'][material] = amnt;
-						}
-					} 
-					if (material in waterTypes) { // see if material found is water
-						if (material in player['stocks']) {
-							player['waterStores'][material] += amnt;	
-						} else {
-							player['waterStores'][material] = amnt;
-						}
-					}
-					if (material in materials) { // see if material found is material
-						if (material in player['stocks']) {
-							player['stocks'][material] += amnt;	
-						} else {
-							player['stocks'][material] = amnt;
-						}
-					}
+					addInventory(material, amnt);
 					updateStocks();  
 				}
 			}
@@ -225,10 +321,10 @@ function explore() {
 
 // functions
 function update () {
-	console.log('tick');
-	affectFood(1);
-	affectWater(1);
-	updateHour(1);
+	if (ticksOn == 1) {
+		console.log('tick');
+	};
+	updateMin(1);
 	checkHealth();
 };
 
@@ -240,7 +336,7 @@ function checkHealth () {
 };
 
 function affectFood(amt) {
-	foodLevel = foodLevel - (amt * foodRate);
+	foodLevel = foodLevel - amt;
 	if (foodLevel > 100) {
 		foodLevel = 100;
 	};
@@ -249,7 +345,7 @@ function affectFood(amt) {
 };
 
 function affectWater(amt) {
-	waterLevel = waterLevel - (amt * waterRate);
+	waterLevel = waterLevel - amt;
 	if (waterLevel > 100) {
 		waterLevel = 100;
 	};
@@ -285,14 +381,31 @@ function updateHour (amt) {
 	}
 	hourStamp.innerHTML = "Hour " + hour;
 	player['hour'] = hour;
+	affectFood(foodRate);
+	affectWater(waterRate);
 };
+
+function updateMin(amt) {
+	min += amt;
+
+	if (min > 59) {
+		min = 0 + (min-60);
+		updateHour(1);
+	}
+	if (minsOn == 1) {
+		console.log(min);
+	};
+	player['min'] = min;	
+}
 
 function startGame() {
 	foodBar.value = player['food'];
 	waterBar.value = player['water'];
 	updateDay(player['day']);
 	updateHour(player['hour']);
+	updateMin(player['min']);
 	updateTools();
+	setLocation('D5');
 	tick = setInterval(update, tickRate);
 
 	log('You awake, washed ashore.');
