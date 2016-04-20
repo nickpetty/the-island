@@ -1,5 +1,5 @@
 var player = {
-	'health':100,
+	'stamina':100,
 	'food':100,
 	'water':100,
 	'day':0,

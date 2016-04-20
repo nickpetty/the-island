@@ -6,8 +6,10 @@ var dayStamp = document.getElementById('day');
 var minStamp = document.getElementById('min');
 var foodLevel = 100;
 var waterLevel = 100;
+var staminaLevel = 100;
 var foodBar = document.getElementById('foodBar');
 var waterBar = document.getElementById('waterBar');
+var staminaBar = document.getElementById('staminaBar');
 var tickRate = 500;
 var tick; // timer
 var ticksOn = 0;
@@ -186,7 +188,7 @@ function map(display) {
 
 function log(text) {
 	var logbook = document.getElementById('logbook');
-	logbook.innerHTML = "<br><font size='2'>  " + text + "</font>" + logbook.innerHTML
+	logbook.innerHTML = "<br><font size='3'>  " + text + "</font>" + logbook.innerHTML
 	console.log(text);
 };
 
@@ -199,6 +201,12 @@ function go(){
 	var crntLocY = parseInt(player['location'][1]);
 	x = x_coord.indexOf(area[0]) - 1;
 	var distance = Math.round(Math.sqrt(Math.pow(x-crntLocX,2) + Math.pow(y-crntLocY,2))); //determine food and water usage based on distance
+	//check stamina
+	if (player['stamina'] < (distance*10)) {
+		log("That's too far.. you need to rest.");
+		map('hidden');
+		return;
+	};
 
 	if (area == 'D5') { // if we're back home
 		if (Object.keys(player['inventory']).length > 0){
@@ -208,6 +216,7 @@ function go(){
 		}
 		affectFood(distance*2);
 		affectWater(distance);
+		affectStamina(distance*10);
 		updateMin(distance*5);
 		setLocation(area);
 		map('hidden');
@@ -222,6 +231,7 @@ function go(){
 		
 		affectFood(distance*2);
 		affectWater(distance);
+		affectStamina(distance*10);
 		updateMin(distance*5);
 		setLocation(area);
 		map('hidden');
@@ -325,6 +335,7 @@ function update () {
 		console.log('tick');
 	};
 	updateMin(1);
+	affectStamina(-0.3); // raises by one
 	checkHealth();
 };
 
@@ -352,6 +363,15 @@ function affectWater(amt) {
 	waterBar.value = waterLevel;
 	player['water'] = waterLevel;
 };
+
+function affectStamina(amt) {
+	staminaLevel = staminaLevel - amt;
+	if (staminaLevel > 100) {
+		staminaLevel = 100;
+	};
+	staminaBar.value = staminaLevel;
+	player['stamina'] = staminaLevel;
+}
 
 function eat (type) {
 	if (foodLevel < 100) {
@@ -401,6 +421,7 @@ function updateMin(amt) {
 function startGame() {
 	foodBar.value = player['food'];
 	waterBar.value = player['water'];
+	staminaBar.value = player['stamina'];
 	updateDay(player['day']);
 	updateHour(player['hour']);
 	updateMin(player['min']);
