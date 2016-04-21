@@ -18,28 +18,7 @@ var foodRate = 0.19;
 var waterRate = 1.4;
 
 // Dicts
-function god(i) {
-	if (i == 1) {
-		foodRate = 0;
-		waterRate = 0;
-		console.log('god mode enabled');
-	};
-	if (i == 0) {
-		foodRate = -0.19;
-		waterRate = -1.4;
-		console.log('god mode disabled');
-	}
-}
-
-function speed(x) {
-	clearInterval(tick);
-	if (x == null) {
-		x = 30000;
-	};
-	tick = setInterval(update, x);
-	console.log('speed changed to ' + x + '.  Default: 30000');
-
-}
+// player['stocks'].indexOf(mat) < -1 ||
 
 function craft(item) {
 	var req = tools[item]['requires'];
@@ -48,18 +27,16 @@ function craft(item) {
 		log('No need to make anymore of these...');
 	} else {
 		for (var mat in req) {
-			if (mat in player['stocks']) { // check if material has been discovered.
-				console.log(tools[item]['requires'][mat]);
-				console.log(player['stocks'][mat]);
-				if (player['stocks'][mat] < tools[item]['requires'][mat]) {
-					log('You need more ' + mat + '. Requires: ' + tools[item]['requires'][mat]);
-					craftable = 1;
-				};
-			} else {
-				log('You still need to find ' + mat);
+			if ( !(mat in player['stocks']) || req[mat] > player['stocks'][mat]) {
+				var x;
+				for (var key in req){
+					log(" - " + key + ": " + req[key]);
+				}
+				log('Requires:');
 				craftable = 1;
-			};
-		};
+				return;
+			}
+		}
 
 		if (craftable == 0) {
 			log('Crafting ' + item);
@@ -74,18 +51,11 @@ function craft(item) {
 			updateTools();
 			updateStocks();
 			updateHour(tools[item]['time']);
-			for (var multi in tools[item]['multipliers']) {
-				if (multi in player['multipliers']) {
-					player['multipliers'][multi] += tools[item]['multipliers'][multi];
-				}  else {
-					player['multipliers'][multi] = tools[item]['multipliers'][multi];
-				};
-			};
 		};
 	};
 };
 
-function gather(material) {
+function gather(material) { // by hand
 
 };
 
@@ -94,7 +64,33 @@ function give(type, obj, amnt) {
 };
 
 function use(obj) {
+	if (obj in tools) {
+		obj = tools[obj];
 
+		//check stamina
+		if (obj['staminaDep'] > player['stamina']) {
+			log('Too weak...');
+			return;
+		};
+
+		//check tool health
+		if (player['tools'][obj['name']] < 1) {
+			log('Your ' + obj['name'] + " is broken... Use again to repair.");
+			delete player['tools'][obj['name']];
+			updateTools();
+		};
+
+		// harvest material
+		for (var mat in obj['harvest']) {
+			var amnt = Math.floor((Math.random() * obj['harvest'][mat]) + 1); // generate amount
+			affectFood( obj['foodUse'] );
+			affectWater( obj['waterUse'] );
+			affectStamina( obj['staminaDep'] );
+			updateMin( obj['time'] );
+			log('Harvested ' + amnt + ' ' + mat);
+		}
+		
+	}
 };
 
 function addStocks(item, amnt) {
@@ -143,14 +139,19 @@ function addInventory(item, amount) {
 	}
 }
 
-function searchArea() {
+function pickUp() {
 
 }
 
 
 function setLocation(area) {
 	var locationSpan = document.getElementById('location');
-	locationSpan.innerHTML = area;
+	if (area in regions) {
+		locationSpan.innerHTML =  area + " - " + regions[area]['name'];
+	} else {
+		locationSpan.innerHTML = area;
+	}
+	
 	player['location'] = area;
 }
 
@@ -164,16 +165,17 @@ function updateStocks() {
 
 function updateTools() {
 	var toolsdiv = document.getElementById('tools');
-	var spanExplore = "<span id='tool' onclick='map(" + '"' + "visible" + '"' + ")'>Map</span>";
-	toolsdiv.innerHTML = spanExplore;
+	var spanExplore = "<span id='mapTool' class='tool' onclick='map(" + '"' + "visible" + '"' + ")'>Map</span>";
+	var spanPick = "<span id='pickTool' class='tool' onclick='pickUp()'>Pickup</span>";
+	toolsdiv.innerHTML = spanPick + spanExplore;
 
 	for (var item in tools) {
 		var span;
 		if (item in player['tools']){
-			span = "<span id='tool' onclick='use(" + '"' + item + '"' + ")'>" + item + "</span>";			
+			span = "<span id='" + item + "Tool' class='tool' onclick='use(" + '"' + item + '"' + ")'>" + item + "</span>";			
 			
 		} else {
-			span = "<span id='tool' style='color:gray;' onclick='craft(" + '"' + item + '"' + ")'>" + item + "</span>";
+			span = "<span id='" + item + "Tool' class='tool' style='color:gray;' onclick='craft(" + '"' + item + '"' + ")'>" + item + "</span>";
 		}
 		toolsdiv.innerHTML += span; 
 	};
@@ -223,7 +225,6 @@ function go(){
 	} else {
 		if (area in regions) {
 			if (!(player['discoveredRegions'].indexOf(area) > -1)) { // discovering region
-				console.log(area);
 				log(regions[area]['dialog']);
 				player['discoveredRegions'].push(area);
 			};
@@ -235,7 +236,20 @@ function go(){
 		updateMin(distance*5);
 		setLocation(area);
 		map('hidden');
+		log('Found ' + itemsInRegion(area) + ' in region ' + area + '.');
 	}
+}
+
+function itemsInRegion(area) {
+	var found = [];
+	if (area in regions){
+		for (var material in regions[area]['materials']){
+			found.push(material);
+		};
+	} else {
+		found = "nothing";
+	}
+	return found;
 }
 
 function explore() {

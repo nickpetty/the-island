@@ -7,7 +7,7 @@ var player = {
 	'min':0,
 	'location':'',
 	'inventory':{},
-	'stocks': {},              // <item_id>:<quanity>
+	'stocks': {'foo':1},              // <item_id>:<quanity>
 	'foodStores': {},          // <food_id>:<quanity>
 	'waterStores': {},         // <water_id>:<quanity>
 	'tools':{},                // <item_id>:<health>

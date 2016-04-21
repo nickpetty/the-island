@@ -2,14 +2,14 @@
 
 <head>
 	<title>The Island</title>
-	<link rel="stylesheet" type="text/css" href="../static/css/index.css?v=22"/>
+	<link rel="stylesheet" type="text/css" href="../static/css/index.css?v=23"/>
 </head>
 
 <body>
 	<div id="hide"></div>
 	<div id="map">
 		<div id="closeMap" onclick="map('hidden')">X</div>
-		<img src="../static/img/mapwhite.png" style="width:100%; height: 75%;">
+		<img src="../static/img/mapwhite1.png" style="width:100%; height: 75%;">
 		<div id="actionButtons">
 			<div id='explore' class="option">
 				<select id="x">
@@ -41,8 +41,9 @@
 	<div id="content">
 		<div id="stats">
 			<label id="day"></label> - <label id="hour"></label>
-			<label style="float:right;  padding-right: 60px">Weight: <span id="weight"/></label>
-			<label style="float:right;  padding-right: 60px">Location: <span id="location"/></label>
+			<label style="float:right;  padding-right: 50px">Location: <span id="location"/></label>
+			<br>
+			<label style="">Weight: <span id="weight"/></label>
 			<p>
 			<label>Food:</label>
 			<br>
@@ -69,6 +70,7 @@
 				<div id="logbook" style="height:100%; width:100%;">
 				</div>
 			</div>
+			<div class="gradientback"></div>
 		</div>
 
 	</div>
@@ -80,6 +82,7 @@
 	<script src="../static/js/foodTypes.js"></script>
 	<script src="../static/js/engine.js"></script>
 	<script src="../static/js/gui.js"></script>
+	<script src="../static/js/debug.js"></script>
 
 </body>
 
